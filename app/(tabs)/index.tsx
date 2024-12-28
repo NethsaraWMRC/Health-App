@@ -17,10 +17,11 @@ function HomeScreen() {
   const [selectedCountry, setSelectedCountry] = useState<string>("LK");
 
   const { data, loading, error } = useFetchData(selectedCountry);
-  const { count } = useCount();
+  const { count, selectedIndex, setIndex } = useCount();
 
   const handleCountrySelect = (countryCode: string) => {
     setSelectedCountry(countryCode);
+    setIndex(-1);
   };
 
   if (loading) {
@@ -45,7 +46,7 @@ function HomeScreen() {
 
         <FlatList
           data={data.results}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <GoalCard
               first_name={
                 item.basic.first_name ||
@@ -61,6 +62,8 @@ function HomeScreen() {
                 item.addresses[1]?.telephone_number ||
                 "No Phone"
               }
+              isSelected={index === selectedIndex}
+              index={index}
             />
           )}
           keyExtractor={(item) => item.number}
@@ -94,9 +97,8 @@ const styles = StyleSheet.create({
   },
   topic: {
     fontSize: 16,
-    fontWeight: 500,
+    fontWeight: "500",
   },
-
   floatingButton: {
     position: "absolute",
     bottom: 16,

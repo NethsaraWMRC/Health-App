@@ -6,10 +6,11 @@ import { useCount } from "@/hooks/useCountIncrement";
 interface GoalCardProps {
   first_name: string;
   last_name: string;
-
   address: string;
   city: string;
   telephone_number: string;
+  isSelected: boolean;
+  index: number;
 }
 
 const capitalizeEachWord = (text: string): string => {
@@ -26,10 +27,22 @@ const GoalCard: React.FC<GoalCardProps> = ({
   address,
   city,
   telephone_number,
+  isSelected,
+  index,
 }) => {
-  const { countIncrement } = useCount();
+  const { countIncrement, setIndex } = useCount();
+
   return (
-    <TouchableOpacity style={styles.container} onPress={countIncrement}>
+    <TouchableOpacity
+      style={[
+        styles.container,
+        { backgroundColor: isSelected ? "rgba(169, 245, 187, 0.5)" : "white" },
+      ]}
+      onPress={() => {
+        countIncrement();
+        setIndex(index);
+      }}
+    >
       <View style={styles.proFrame}>
         <Image
           source={require("../assets/images/user.png")}
@@ -37,7 +50,9 @@ const GoalCard: React.FC<GoalCardProps> = ({
         />
       </View>
       <View style={{ display: "flex", width: "80%" }}>
-        <Text style={styles.name}>
+        <Text
+          style={[styles.name, { color: isSelected ? "#008c21" : "black" }]}
+        >
           {capitalizeEachWord(first_name)} {capitalizeEachWord(last_name)}
         </Text>
         <Text style={styles.address}>
@@ -73,7 +88,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
-    fontWeight: 600,
+    fontWeight: 700,
     color: "#010f24",
   },
 
