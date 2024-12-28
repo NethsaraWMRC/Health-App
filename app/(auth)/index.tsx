@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  Button,
   Text,
   Image,
   StyleSheet,
@@ -10,28 +9,48 @@ import {
 } from "react-native";
 import { useAuth } from "../../hooks/auth/AuthContext";
 import { Link, useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
   const { login } = useAuth();
   const router = useRouter();
 
-  const validEmail = "r@gmail.com";
-  const validPassword = "123";
-
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (!email || !password) {
       setError("Email and password are required.");
       return;
     }
 
-    if (email === validEmail && password === validPassword) {
+    try {
+      const existingData = await AsyncStorage.getItem("users");
+      const usersArray = existingData ? JSON.parse(existingData) : [];
+
+      const user = usersArray.find((u: any) => u.email === email);
+
+      if (!user) {
+        setError("Email not registered.");
+        return;
+      }
+
+      if (user.password !== password) {
+        setError("Incorrect password.");
+        return;
+      }
+
+      setError("");
       login();
-      router.push("/(tabs)");
-    } else {
-      setError("Invalid email or password.");
+
+      router.push({
+        pathname: "/(tabs)",
+        params: { name: user.name, email: user.email },
+      });
+    } catch (err) {
+      console.error("Failed to validate user", err);
+      setError("An error occurred. Please try again.");
     }
   };
 
@@ -51,7 +70,7 @@ const SignIn = () => {
         Welcome!
       </Text>
       <Text style={{ fontSize: 28, marginBottom: 20, textAlign: "center" }}>
-        to <Text style={styles.brandName}>Mind Sphere</Text>
+        to <Text style={styles.brandName}>Health Locator</Text>
       </Text>
       <TextInput
         placeholder="Email"

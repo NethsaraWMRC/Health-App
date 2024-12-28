@@ -1,78 +1,117 @@
-import { Image, StyleSheet, Platform } from "react-native";
+import CountrySelect from "@/components/CountrySelect";
+import GoalCard from "@/components/ItemCard";
+import ProfileBar from "@/components/ProfileBar";
+import { useCount } from "@/hooks/useCountIncrement";
+import useFetchData from "@/hooks/useFetchList";
+import { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { CountProvider } from "@/hooks/useCountIncrement";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+function HomeScreen() {
+  const [selectedCountry, setSelectedCountry] = useState<string>("LK");
 
-export default function HomeScreen() {
+  const { data, loading, error } = useFetchData(selectedCountry);
+  const { count } = useCount();
+
+  const handleCountrySelect = (countryCode: string) => {
+    setSelectedCountry(countryCode);
+  };
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
+  if (!data || !data.results || data.results.length === 0) {
+    return <Text>No data available</Text>;
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <ProfileBar />
+
+      <View style={styles.subContainer}>
+        <CountrySelect onSelect={handleCountrySelect} />
+        <Text style={styles.topic}>Find your health provider.</Text>
+
+        <FlatList
+          data={data.results}
+          renderItem={({ item }) => (
+            <GoalCard
+              first_name={
+                item.basic.first_name ||
+                item.basic.authorized_official_first_name
+              }
+              last_name={
+                item.basic.last_name || item.basic.authorized_official_last_name
+              }
+              address={item.addresses[1]?.address_1 || "No Address"}
+              city={item.addresses[1]?.city || "No City"}
+              telephone_number={
+                item.addresses[0]?.telephone_number ||
+                item.addresses[1]?.telephone_number ||
+                "No Phone"
+              }
+            />
+          )}
+          keyExtractor={(item) => item.number}
         />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+
+      <TouchableOpacity style={styles.floatingButton}>
+        <Text style={styles.floatingButtonText}>{count}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+export default function HomeScreenWrapper() {
+  return (
+    <CountProvider>
+      <HomeScreen />
+    </CountProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  subContainer: {
+    padding: 16,
+    gap: 15,
+    backgroundColor: "#ededeb",
+    height: "91%",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  topic: {
+    fontSize: 16,
+    fontWeight: 500,
+  },
+
+  floatingButton: {
     position: "absolute",
+    bottom: 16,
+    right: 16,
+    backgroundColor: "green",
+    borderRadius: 50,
+    width: 56,
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 4,
+  },
+  floatingButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

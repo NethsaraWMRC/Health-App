@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
@@ -7,17 +7,17 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 
 export default function TabLayout() {
+  const { email } = useLocalSearchParams();
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#353636",
         tabBarInactiveTintColor: "#808080",
-        headerShown: false,
+
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: "absolute",
           },
           default: {},
@@ -31,12 +31,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="house.fill" color={color} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="settings"
+        initialParams={{ email }}
         options={{
-          title: "Explore",
+          title: "Settings",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="paperplane.fill" color={color} />
           ),
