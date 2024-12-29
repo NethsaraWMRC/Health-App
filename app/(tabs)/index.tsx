@@ -70,7 +70,7 @@ function HomeScreen() {
         />
       </View>
 
-      <TouchableOpacity style={styles.floatingButton}>
+      <TouchableOpacity style={styles.floatingButton} disabled={true}>
         <Text style={styles.floatingButtonText}>{count}</Text>
       </TouchableOpacity>
     </View>

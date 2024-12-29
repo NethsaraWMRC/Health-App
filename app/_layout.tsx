@@ -1,6 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 import { AuthProvider, useAuth } from "../hooks/auth/AuthContext";
+import { StatusBar } from "react-native";
 
 const RootLayout = () => {
   const { isAuthenticated } = useAuth();
@@ -19,6 +20,7 @@ const RootLayout = () => {
 export default function Layout() {
   return (
     <AuthProvider>
+      <StatusBar backgroundColor={"black"} />
       <RootLayout />
     </AuthProvider>
   );

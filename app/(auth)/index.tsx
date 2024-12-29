@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import { useAuth } from "../../hooks/auth/AuthContext";
 import { Link, useRouter } from "expo-router";
@@ -61,6 +62,7 @@ const SignIn = () => {
         height: "100%",
       }}
     >
+      <StatusBar />
       <Image
         source={require("../../assets/images/brain.png")}
         style={styles.logo}
